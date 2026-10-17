@@ -31,7 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.lemonade.ui.theme.LemonadeTheme
+import ci.pigier.lemonade.ui.theme.LemonadeTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 //affichage l'Etape courante de la preparation et des pression à effectuer
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LemonadeApp(){
     var etape by rememberSaveable { mutableIntStateOf(1) }
@@ -55,12 +55,12 @@ fun LemonadeApp(){
             CenterAlignedTopAppBar(
                 title = {Text(text="Lemonade")},
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFFFF9E44c)
+                    containerColor = Color(0xFFF9E44C)
                 )
             )
         }
     ){ innerPadding->
-            Etapecitronnade(
+            EtapeCitronnade(
                 etape = etape,
                 onImageClick = {
                     when (etape) {
@@ -83,6 +83,66 @@ fun LemonadeApp(){
     }
 }
 
+@Composable
+fun EtapeCitronnade(
+    etape: Int,
+    onImageClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    //  choix du texte, d'image et de description pour chauqe étape
+    val texteRes: Int
+    val imageRes: Int
+    val descriptionRes: Int
+    when (etape) {
+        1 -> {
+            texteRes = R.string.lemon_select
+            imageRes = R.drawable.lemon_tree
+            descriptionRes = R.string.lemon_tree_content_description
+        }
+        2 -> {
+            texteRes = R.string.lemon_squeeze
+            imageRes = R.drawable.lemon_squeeze
+            descriptionRes = R.string.lemon_content_description
+        }
+        3 -> {
+            texteRes = R.string.lemon_drink
+            imageRes = R.drawable.lemon_drink
+            descriptionRes = R.string.lemonade_content_description
+        }
+        else -> {
+            texteRes = R.string.lemon_empty_glass
+            imageRes = R.drawable.lemon_restart
+            descriptionRes = R.string.empty_glass_content_description
+        }
+    }
 
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // ajout de L'image dans un bouton pour qu'on puisse cliquer dessus
+        Button(
+            onClick = onImageClick,
+            shape = RoundedCornerShape(40.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFFC3ECD2) // vert clair autour de l'image
+            )
+        ) {
+            Image(
+                painter = painterResource(imageRes),
+                contentDescription = stringResource(descriptionRes),
+                modifier = Modifier.padding(16.dp)
+            )
+        }
 
-                }
+        // ajout d'espace pour que le texte ne colle pas à l'image
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = stringResource(texteRes),
+            fontSize = 18.sp,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+    }
+}
